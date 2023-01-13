@@ -1,2 +1,2 @@
 # Whisper-Clone
-This is a simple clone of the Whisper Website
+This webapp lets users share their secrets online annonymmously. This was heavily inspired by the Whisper website.
