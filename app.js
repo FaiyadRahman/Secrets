@@ -165,7 +165,7 @@ app.post("/login", (req, res) => {
         res.redirect("/secrets");
       });
     } else {
-      console.log(err);
+      res.redirect("/login");
     }
   });
 });
