@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(
   session({
-    secret: "test",
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
   })
@@ -161,11 +161,11 @@ app.post("/login", (req, res) => {
 
   req.login(user, (err) => {
     if (!err) {
-      passport.authenticate("local")(req, res, () => {
+      passport.authenticate("local", {failureRedirect: '/login'})(req, res, () => {
         res.redirect("/secrets");
       });
     } else {
-      res.redirect("/login");
+      console.log(err);
     }
   });
 });
