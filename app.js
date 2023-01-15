@@ -27,7 +27,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 mongoose.set("strictQuery", true);
-mongoose.connect("mongodb://127.0.0.1:27017/userDB");
+mongoose.connect(process.env.MONGO_ATLAS_URL);
 
 const userSchema = new mongoose.Schema({
   email: String,
@@ -64,9 +64,12 @@ passport.use(
       userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     },
     function (accessToken, refreshToken, profile, cb) {
-      User.findOrCreate({username: profile.emails[0].value, googleId: profile.id }, function (err, user) {
-        return cb(err, user);
-      });
+      User.findOrCreate(
+        { username: profile.emails[0].value, googleId: profile.id },
+        function (err, user) {
+          return cb(err, user);
+        }
+      );
     }
   )
 );
@@ -101,15 +104,19 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/secrets", (req, res) => {
-  User.find({ secret: { $ne: null } }, (err, foundUser) => {
-    if (!err) {
-      if (foundUser) {
-        res.render("secrets", { usersWithSecrets: foundUser });
+  if (req.isAuthenticated()) {
+    User.find({ secret: { $ne: null } }, (err, foundUser) => {
+      if (!err) {
+        if (foundUser) {
+          res.render("secrets", { usersWithSecrets: foundUser });
+        }
+      } else {
+        console.log(err);
       }
-    } else {
-      console.log(err);
-    }
-  });
+    });
+  } else {
+    res.redirect("/");
+  }
 });
 
 app.get("/logout", (req, res) => {
